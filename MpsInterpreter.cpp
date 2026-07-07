@@ -729,7 +729,9 @@ void Interpreter::execDo(Command* cmd)
             frame.cmdIdx = 0;
             d_callStack.push(frame);
 
+            const bool savedTestFlag = d_testFlag;
             runBlock(d_curRoutine, idx, 0);
+            d_testFlag = savedTestFlag;
 
             StackFrame restored = d_callStack.pop();
             restoreFrame(restored);
@@ -790,7 +792,9 @@ void Interpreter::execDo(Command* cmd)
             d_locals.getOrCreate(formal)->setValue(actuals[p].str());
         }
 
+        const bool savedTestFlag = d_testFlag;
         runBlock(targetRoutine, idx, 0);
+        d_testFlag = savedTestFlag;
 
         StackFrame restored = d_callStack.pop();
         restoreFrame(restored);
@@ -2669,8 +2673,11 @@ Value Interpreter::callExtrinsic(ExprAtom* a)
 
     Routine* savedRoutine = d_curRoutine;
     int savedLine = d_curLine;
+    const bool savedTestFlag = d_testFlag;
 
     runBlock(targetRoutine, idx, 0);
+
+    d_testFlag = savedTestFlag;
 
     // Get return value from QUIT expr
     Node* retNode = d_locals.get(retVarName);
