@@ -29,6 +29,7 @@
 #include <QtDebug>
 #include <qmath.h>
 #include <cstdio>
+#include <chrono>
 #include <cstdlib>
 using namespace Mps;
 
@@ -2344,6 +2345,27 @@ Value Interpreter::getSpecialVar(const QByteArray& name)
 
     if( upper == "ZE" || upper == "ZERROR" )
         return Value();
+
+    if( upper == "ZH" || upper == "ZHOROLOG" )
+    {
+        // GT.M / YottaDB compatible $ZHOROLOG: $HOROLOG extended with two
+        // extra pieces -> days,secondsSinceMidnight,microsecondsWithinSecond,
+        // tzOffsetSeconds. All four pieces are derived from a single clock
+        // reading so they are mutually consistent.
+        using namespace std::chrono;
+        long long usEpoch = duration_cast<microseconds>(
+                    system_clock::now().time_since_epoch()).count();
+        int tz = QDateTime::currentDateTime().offsetFromUtc(); // local UTC offset, seconds
+        long long usWithinSec = usEpoch % 1000000;
+        long long secsEpochUtc = usEpoch / 1000000;
+        long long localSecs = secsEpochUtc + tz;
+        // 47117 = $HOROLOG day number of 1970-01-01 (days since 1840-12-31)
+        long long days = 47117 + (localSecs / 86400);
+        long long secsMid = localSecs % 86400;
+        return Value(QByteArray::number(days) + "," + QByteArray::number(secsMid)
+                     + "," + QByteArray::number(usWithinSec)
+                     + "," + QByteArray::number(tz));
+    }
 
     if( upper == "ZV" || upper == "ZVERSION" )
         return Value("MUMPS76-Interp"); // TODO
