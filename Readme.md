@@ -43,7 +43,7 @@ Consider what MUMPS had in the late sixties that the rest of the database world 
 - Schema-free storage: No declarations required. Nodes are created on first assignment, deleted on demand. The tree structure is fully dynamic. This is what MongoDB would call "schemaless documents" in 2009.
 - Hierarchical data model: Patient records naturally form trees; a patient has labs, each lab has results, each result has values. MUMPS globals mirror this structure directly. This is what Firebase would call "real-time hierarchical data" in 2012.
 - Ordered key traversal: The `$NEXT` function (later `$ORDER`) walks through sibling nodes in sorted order, without requiring an explicit index. This is what Redis would call "sorted sets" in 2009, or what LevelDB would call "ordered iteration" in 2011.
-- Atomic multi-user access: Multiple users can read and write the same globals concurrently. The LOCK command provides application-level concurrency control. This is what modern databases call "optimistic concurrency."
+- Atomic multi-user access: Multiple users can read and write the same globals concurrently. The LOCK command provides application-level concurrency control. This is exactly the kind of application-managed concurrency that the NoSQL movement adopted decades later.
 - Integrated language + database: There is no impedance mismatch between the programming language and the data store. Variables and database nodes use the same syntax, the same data types, the same operations. This is what some modern systems aspire to but none have achieved as cleanly.
 
 All of this ran on a machine with 8 kilobytes of memory, serving many simultaneous users in real-time.
